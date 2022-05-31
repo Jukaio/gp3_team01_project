@@ -15,12 +15,21 @@ class GP3_TEAM01_API UFG_DA_MoveStats : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float GroundAcceleration;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Acceleration)
+	float MaxAcceleration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Acceleration)
+	class UCurveFloat* AccelerationCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Rotation)
+	float MaxRotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Rotation)
+	class UCurveFloat* RotationCurve;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float GroundFriction;
+	float Friction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float GroundMaxSpeed;
+	float MaxSpeed;
 };

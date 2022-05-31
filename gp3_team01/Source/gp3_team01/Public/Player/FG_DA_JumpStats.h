@@ -15,11 +15,14 @@ class GP3_TEAM01_API UFG_DA_JumpStats : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float RayDistance;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Force)
+	float JumpForce;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Force)
+	class UCurveFloat* ForceCurve;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float JumpForce;
+	float RayDistance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float DisableFloatingTime;

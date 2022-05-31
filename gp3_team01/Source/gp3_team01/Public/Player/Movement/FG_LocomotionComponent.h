@@ -14,7 +14,6 @@ class GP3_TEAM01_API UFG_LocomotionComponent : public UActorComponent
 protected:
 	virtual void BeginPlay() override;
 
-
 public:	//Public functions
 	UFG_LocomotionComponent();
 
@@ -25,12 +24,16 @@ public:	//Public functions
 	/// </summary>
 	UFUNCTION(BlueprintCallable)
 	void Move(class UFG_DA_InputStats* InputStats, class UFG_DA_MoveStats* MoveStats);
+	UFUNCTION(BlueprintCallable)
+	void MoveRAW(FVector InputVector, float Acceleration, float MaxSpeed);
 
 	/// <summary>
 	/// Reduces velocity with friction
 	/// </summary>
 	UFUNCTION(BlueprintCallable)
 	void ApplyFriction(class UFG_DA_MoveStats* MoveStats);
+	UFUNCTION(BlueprintCallable)
+	void ApplyFrictionRAW(float Friction);
 
 	/// <summary>
 	/// Moves and applies friction
@@ -44,6 +47,14 @@ public:	//Public functions
 	/// </summary>
 	UFUNCTION(BlueprintCallable)
 	bool Hover(class UFG_DA_HoverStats* HoverStats);
+	UFUNCTION(BlueprintCallable)
+	bool HoverRAW(float HoverDistance, float HoverStrength, float HoverDamping);
+
+	/// <summary>
+	/// Checks if ledge in the check direction is valid. The ledgecheck is in the shape of a hook
+	/// </summary>
+	UFUNCTION(BlueprintCallable)
+	bool IsLedgeVaultableRAW(FVector CheckDirection, float RayLength, float RayLengthUp, float RayLengthDown);
 
 	/// <summary>
 	/// Makes an overlap check around given component.
@@ -52,11 +63,16 @@ public:	//Public functions
 	UFUNCTION(BlueprintCallable)
 	bool CheckTouching(class UPrimitiveComponent* Component);
 
+	UFUNCTION(BlueprintCallable)
+	void RotatePlayerRAW(FVector Direction, float RotationSpeed);
+
 	/// <summary>
 	/// Jumps. Also very momentarily disables floating
 	/// </summary>
 	UFUNCTION(BlueprintCallable)
 	void Jump(class UFG_DA_JumpStats* JumpStats);
+	UFUNCTION(BlueprintCallable)
+	void JumpRAW(float JumpForce, float RayDistance, float DisableFloatingTime);
 
 	/// <summary>
 	/// Disables floating for a period of time. 

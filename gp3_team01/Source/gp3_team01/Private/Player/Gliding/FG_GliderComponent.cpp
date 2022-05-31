@@ -22,6 +22,7 @@ void UFG_GliderComponent::BeginPlay()
 	LocomotionComponent = Cast<UFG_LocomotionComponent>(GetOwner()->GetComponentByClass(UFG_LocomotionComponent::StaticClass())); //TODO:: Decouple reference
 	
 	CapsuleComponent = Cast<UCapsuleComponent>(GetOwner()->GetComponentByClass(UCapsuleComponent::StaticClass()));
+	StaticMeshComponent =  Cast<UStaticMeshComponent>(GetOwner()->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 	if(CapsuleComponent == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Glider components capsule component is nullptr"))
@@ -43,13 +44,42 @@ void UFG_GliderComponent::Glide()
 	
 	CurrentVelocity += GlideDirection * -LiftForceNormalized * GlidingForce * GetWorld()->DeltaTimeSeconds;
 	
-	CurrentVelocity = FMath::Lerp( CurrentVelocity, GlideDirection * CurrentVelocity.Size(), 1 - FMath::Exp(-TurningEfficiency * GetWorld()->DeltaTimeSeconds));
-	GravitationalForce = CurrentVelocity.Size() < MinimumGlideMomentum ? GravitationalForce + GravityForce * GravityForce * GetWorld()->DeltaTimeSeconds :GravitationalForce - GravityForce * GravityForce * GetWorld()->DeltaTimeSeconds;
-	FVector MinimumGlidingSpeed = FVector(CurrentVelocity.X, CurrentVelocity.Y, 0.f).GetSafeNormal() * 100.f;
-	
+	CurrentVelocity = FMath::Lerp( CurrentVelocity, GlideDirection * CurrentVelocity.Size(), 1 - FMath::Exp(-TurningEfficiency * GetWorld()->DeltaTimeSeconds)) * (1 + (CurrentVelocity.GetSafeNormal() | GlideDirection)) / 2;
+	GravitationalForce = CurrentVelocity.Size() < MinimumGlideMomentum ? GravitationalForce + GravityForce * GravityForce * GetWorld()->DeltaTimeSeconds : GravitationalForce - GravityForce * GravityForce * GetWorld()->DeltaTimeSeconds;
 	GravitationalForce = FMath::Clamp(GravitationalForce, 0.f, MaxGravitationalVelocity);
-	CapsuleComponent->SetPhysicsLinearVelocity(CurrentVelocity + GravitationalForce * FVector::DownVector + MinimumGlidingSpeed);
+	FVector Momentum = CapsuleComponent->GetPhysicsLinearVelocity();
 	
+	Momentum = FMath::Lerp( Momentum, GlideDirection * Momentum.Size(), 1 - FMath::Exp(-1.f * GetWorld()->DeltaTimeSeconds )) ;
+	
+	FVector DeltaVelocity = CurrentVelocity - PreviousVelocity;
+	
+	CapsuleComponent->SetPhysicsLinearVelocity(DeltaVelocity + Momentum + GravitationalForce * FVector::DownVector);
+	PreviousVelocity = CurrentVelocity;
+	
+	FQuat TargetRotation = CapsuleComponent->GetPhysicsLinearVelocity().ToOrientationQuat();
+	FQuat PlayerRotation = FQuat::Slerp(  GetOwner()->GetActorForwardVector().ToOrientationQuat(), TargetRotation, 50.f * GetWorld()->DeltaTimeSeconds);
+	GetOwner()->SetActorRotation(PlayerRotation);
+}
+
+void UFG_GliderComponent::GlideAxisControlled()
+{
+	FVector InputVector = FVector::RightVector * Input.X;
+	
+	GlideDirection = FMath::Lerp(GlideDirection, LookDirection, 1 - FMath::Exp(-TurningSpeed * GetWorld()->DeltaTimeSeconds)).GetSafeNormal();
+	float LiftForceNormalized = FVector::UpVector | GlideDirection;
+	CurrentVelocity += GlideDirection * -LiftForceNormalized * GlidingForce * GetWorld()->DeltaTimeSeconds;
+	
+	CurrentVelocity = FMath::Lerp( CurrentVelocity, GlideDirection * CurrentVelocity.Size(), 1 - FMath::Exp(-TurningEfficiency * GetWorld()->DeltaTimeSeconds));
+	GravitationalForce = CurrentVelocity.Size() < MinimumGlideMomentum ? GravitationalForce + GravityForce * GravityForce * GetWorld()->DeltaTimeSeconds : GravitationalForce - GravityForce * GravityForce * GetWorld()->DeltaTimeSeconds;
+
+	FVector Momentum = CapsuleComponent->GetPhysicsLinearVelocity();
+
+	Momentum = FMath::Lerp( Momentum, GlideDirection * Momentum.Size(), 1 - FMath::Exp(-1.f * GetWorld()->DeltaTimeSeconds));
+	GravitationalForce = FMath::Clamp(GravitationalForce, 0.f, MaxGravitationalVelocity);
+	FVector DeltaVelocity = CurrentVelocity - PreviousVelocity;
+	
+	CapsuleComponent->SetPhysicsLinearVelocity(DeltaVelocity + Momentum );
+	PreviousVelocity = CurrentVelocity;
 }
 
 void UFG_GliderComponent::Boost(FVector Boost)

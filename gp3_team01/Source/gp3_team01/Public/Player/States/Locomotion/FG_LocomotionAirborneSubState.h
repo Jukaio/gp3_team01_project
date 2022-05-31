@@ -14,5 +14,8 @@ class GP3_TEAM01_API UFG_LocomotionAirborneSubState : public UFG_LocomotionSubSt
 {
 	GENERATED_BODY()
 	
+	virtual void OnStateEnter_Implementation() override;
 	virtual bool OnStateTick_Implementation(float DeltaTime) override;
+
+	float Timer = 0.0f;
 };

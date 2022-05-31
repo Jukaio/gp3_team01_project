@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Player/Gliding/FG_GliderComponent.h"
 #include "Player/States/FG_PlayerState.h"
 #include "FG_GlidingPlayerState.generated.h"
 
@@ -32,8 +33,14 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UFG_GlidingSteeringSubState* GlidingSteeringSubState;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UFG_GliderComponent* GliderComponent;
+	bool bIsColliding;
 
 	virtual void OnStateEnter_Implementation() final;
 	virtual void OnStateExit_Implementation() final;
 	virtual bool OnStateTick_Implementation(float DeltaTime) final;
+	UFUNCTION()
+	void OnCollision(UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1,
+	                 FVector Vector, const FHitResult& HitResult);
 };

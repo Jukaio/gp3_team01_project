@@ -58,6 +58,7 @@ public:
 	class UFG_DA_InputStats* InputStats;
 	FVector CurrentVelocity;
 	FVector Input;
+	FVector PreviousVelocity = FVector::ZeroVector;
 
 protected:
 	// Called when the game starts
@@ -68,6 +69,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void Glide();
+	void GlideAxisControlled();
 	void Boost(FVector Boost);
 	
 	void DrawDebug();

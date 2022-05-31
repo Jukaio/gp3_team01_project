@@ -25,7 +25,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void OnStateEnter_Implementation() final;
-	virtual void OnStateExit_Implementation() final;
-	virtual bool OnStateTick_Implementation(float DeltaTime) final;
+	virtual void OnStateEnter_Implementation() override final;
+	virtual void OnStateExit_Implementation() override final;
+	virtual bool OnStateTick_Implementation(float DeltaTime) override final;
 };

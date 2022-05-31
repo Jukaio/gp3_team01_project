@@ -16,4 +16,7 @@ class GP3_TEAM01_API UFG_LocomotionJumpingSubState : public UFG_LocomotionSubSta
 	
 	virtual void OnStatePush_Implementation() override;
 	virtual bool OnStateTick_Implementation(float DeltaTime) override;
+
+	bool bWasJustPushed = false;
+	float Timer = 0.0f;
 };

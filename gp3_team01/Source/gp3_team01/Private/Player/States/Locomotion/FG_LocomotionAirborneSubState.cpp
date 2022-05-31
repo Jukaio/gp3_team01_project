@@ -10,31 +10,39 @@
 #include "Player/States/Locomotion/FG_LocomotionJumpingSubState.h"
 #include "Player/States/Core/FG_GlidingPlayerState.h"
 
+void UFG_LocomotionAirborneSubState::OnStateEnter_Implementation()
+{
+	Timer = 0.0f;
+}
+
 bool UFG_LocomotionAirborneSubState::OnStateTick_Implementation(float DeltaTime)
 {
-	GEngine->AddOnScreenDebugMessage
-	(
-		INDEX_NONE,
-		DeltaTime,
-		FColor::Magenta,
-		TEXT("I AM RUNNIN!")
-	);
-
 	//Input
 	const UFG_DA_InputStats* InputStats = FGPlayerCharacter->Stats->InputStats;
 	const FVector Input = InputStats->GetCameraNormalisedInputVector();
-	if (InputStats->GetIsGlidingPressed()) 
+	if (InputStats->GetWasGlidingJustPressed()) 
 	{
 		FGPlayerCharacter->StateMachine->Push(FGPlayerCharacter->GlidingCoreState);
 		return true;
 	}
 
-	//Apply movement
-	if (!Input.IsNearlyZero()) 
-	{
-		FGPlayerCharacter->LocomotionComp->Move(FGPlayerCharacter->Stats->InputStats, FGPlayerCharacter->Stats->AirborneStats);
-	}
-	FGPlayerCharacter->LocomotionComp->ApplyFriction(FGPlayerCharacter->Stats->AirborneStats);
+	UFG_DA_MoveStats* AirborneStats = FGPlayerCharacter->Stats->AirborneStats;
+	UFG_LocomotionComponent* Locomotion = FGPlayerCharacter->LocomotionComp;
+
+	float Acceleration = AirborneStats->AccelerationCurve ? AirborneStats->AccelerationCurve->GetFloatValue(Timer) : 1.0f;
+	Acceleration *= AirborneStats->MaxAcceleration;
+	Locomotion->MoveRAW(Input, Acceleration, AirborneStats->MaxSpeed);
+	Locomotion->ApplyFriction(AirborneStats);
+
+	float RotationSpeed = AirborneStats->RotationCurve ? AirborneStats->RotationCurve->GetFloatValue(Timer) : 1.0f;
+	RotationSpeed *= AirborneStats->MaxRotation;
+
+	FVector ZInputDir = FGPlayerCharacter->Stats->InputStats->GetCameraNormalisedInputVector();
+	FGPlayerCharacter->LocomotionComp->RotatePlayerRAW(ZInputDir, RotationSpeed);
+
+	const FRichCurveKey LastKey = AirborneStats->AccelerationCurve->FloatCurve.GetLastKey();
+	Timer += DeltaTime;
+	Timer = FMath::Clamp(Timer, 0.0f, LastKey.Time);
 
 	//you should pop yourself NOW - LTG
 	const bool IsGrounded = FGPlayerCharacter->LocomotionComp->Hover(FGPlayerCharacter->Stats->HoverStats);
