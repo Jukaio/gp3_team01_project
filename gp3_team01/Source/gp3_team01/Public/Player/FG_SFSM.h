@@ -34,16 +34,22 @@ public:
 	void OnStateMachineTick(float DeltaTime);
 	
 	UFUNCTION(BlueprintCallable)
-	void Push(UPARAM(ref) const TScriptInterface<IFG_State>& State);
+	void Push(TScriptInterface<IFG_State> State);
 
 	UFUNCTION(BlueprintCallable)
 	void Pop();
 
 	UFUNCTION(BlueprintPure)
-	bool Contains(UPARAM(ref) const TScriptInterface<IFG_State>& State) const;
+	bool Contains(TScriptInterface<IFG_State> State) const;
+
+	// C++ only for now..
+	uint64 Count(TScriptInterface<IFG_State> State) const;
+
+	UFUNCTION(BlueprintPure)
+	bool TopIsEqual(TScriptInterface<IFG_State> State) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool PopUntil(UPARAM(ref) TScriptInterface<IFG_State>& State);
+	bool PopUntil(TScriptInterface<IFG_State> State);
 
 	UFUNCTION(BlueprintCallable)
 	void Clear();
@@ -52,9 +58,8 @@ public:
 	bool IsEmpty();
 
 private:
-
 	UPROPERTY()
 	TArray<FStateObjectPair> StateStack;
-	UPROPERTY()
+
 	bool bIsPoppingNotAllowed = false;
 };

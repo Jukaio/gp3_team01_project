@@ -15,13 +15,16 @@ class GP3_TEAM01_API UFG_DA_HoverStats : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HoverDistance;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HoverRayDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HoverStrength;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HoverDamping;
 
 	

@@ -11,7 +11,7 @@ void IFG_State::OnStateEnter_Implementation()
 
 bool IFG_State::OnStateTick_Implementation(float DeltaTime)
 {
-	return true;
+	return false;
 }
 
 void IFG_State::OnStateExit_Implementation()

@@ -62,7 +62,6 @@ void AFG_Camera::Tick(float DeltaTime)
 
 	SetActorLocation(Location);
 
-	
 }
 
 void AFG_Camera::SetFollowActor(AActor* Actor)
@@ -70,15 +69,56 @@ void AFG_Camera::SetFollowActor(AActor* Actor)
 	FollowActor = Actor;
 }
 
-void AFG_Camera::HandleCameraXRotation(float InputAxis)
+void AFG_Camera::SetManuallyControllable(bool bSetManualControl)
 {
-	AddActorLocalRotation(FRotator(0, CameraStats->CameraPanSpeed * InputAxis, 0));
+	bManuallyControllable = bSetManualControl;
+}
+
+void AFG_Camera::RotateCamera(FVector Direction, float RotationDelta)
+{
+	//ToOrientationQuat does not like 0 vectors
+
+	//Fuck shit this doesnt work
+
+	if (Direction == FVector::ZeroVector) 
+	{
+		return;
+	}
+	Direction.Normalize();
+
+	FRotator TargetRotation = Direction.ToOrientationRotator();
+	float YAxis = Camera->GetRelativeRotation().Pitch;
+	YAxis = FMath::Lerp(YAxis, TargetRotation.Pitch, RotationDelta);
+
+	float XAxis = SpringArm->GetRelativeRotation().Yaw;
+	XAxis = FMath::Lerp(XAxis, TargetRotation.Yaw, RotationDelta);
+	
+	FRotator CameraRotator = FRotator(YAxis, 0, 0);
+	FRotator SpringArmRotator = FRotator(0, XAxis, 0);
+
+	Camera->SetWorldRotation(CameraRotator);
+	SpringArm->SetWorldRotation(SpringArmRotator);
 }
 
 //Note that the XRotation and YRotation functions rotates 2 seperate SceneComponents on their respective axises, since SpringArm is parented on the root component 
 //Alfons isn't good at handling rotation math.
+void AFG_Camera::HandleCameraXRotation(float InputAxis)
+{
+	if (!bManuallyControllable)
+	{
+		return;
+	}
+	AddActorLocalRotation(FRotator(0, CameraStats->CameraPanSpeed * InputAxis, 0));
+	
+}
+
+
 void AFG_Camera::HandleCameraYRotation(float InputAxis)
 {
+	if (!bManuallyControllable)
+	{
+		return;
+	}
 	float YAxis = SpringArm->GetTargetRotation().Pitch + CameraStats->CameraPanSpeed * InputAxis;
 	YAxis = FMath::Clamp(YAxis, CameraStats->MinimumTurnAngle, CameraStats->MaxTurnAngle);
 

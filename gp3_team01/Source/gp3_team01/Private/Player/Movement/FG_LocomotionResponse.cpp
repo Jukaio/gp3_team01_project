@@ -15,7 +15,19 @@ void IFG_LocomotionResponse::OnLocomotionLand_Implementation(UFG_LocomotionCompo
 
 }
 
+void IFG_LocomotionResponse::OnLocomotionMove_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller)
+{
+}
+
+void IFG_LocomotionResponse::OnLocomotionStand_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller)
+{
+}
+
 void IFG_LocomotionResponse::OnLocomotionTouch_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller, EFG_TouchingState State)
 {
 	
+}
+
+void IFG_LocomotionResponse::OnLocomotionLeft_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller)
+{
 }

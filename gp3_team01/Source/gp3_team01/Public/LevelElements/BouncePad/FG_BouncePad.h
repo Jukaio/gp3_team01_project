@@ -15,8 +15,17 @@ public:
 	// Sets default values for this actor's properties
 	AFG_BouncePad();
 
+	void BeginPlay() override;
+
 	UFUNCTION(BlueprintCallable)
-	void Bounce(class UPrimitiveComponent* OtherActor);
+	void Bounce(UFG_LocomotionComponent* Locomotion, float RayDistance, float DisableFloatTimer);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UFG_DA_Instrument* Instrument;
+	UPROPERTY()
+	class UInstrumentChord* CurrentChord;
+	UPROPERTY()
+	class UFG_InstrumentComponent* InstrumentHandler;
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
@@ -25,6 +34,7 @@ public:
 	class UBoxComponent* BoxTrigger;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = BouncePad)
-	float BounceForce = 50000.f;
+	float BounceForce = 1200.f;
 
+	float LastTimeBounced = 0.0f;
 };

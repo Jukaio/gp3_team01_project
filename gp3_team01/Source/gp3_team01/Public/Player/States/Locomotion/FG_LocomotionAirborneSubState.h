@@ -17,5 +17,16 @@ class GP3_TEAM01_API UFG_LocomotionAirborneSubState : public UFG_LocomotionSubSt
 	virtual void OnStateEnter_Implementation() override;
 	virtual bool OnStateTick_Implementation(float DeltaTime) override;
 
-	float Timer = 0.0f;
+	void BroadcastAirMovingEvents(const FVector& Input);
+
+	bool bWasMovingPreviousFrame = false;
+public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartAirMoving(class AFG_PlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAirMoving(class AFG_PlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnEndAirMoving(class AFG_PlayerCharacter* PlayerCharacter);
 };

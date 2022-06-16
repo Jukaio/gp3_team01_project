@@ -6,6 +6,8 @@
 #include "Player/Gliding/FG_GliderComponent.h"
 #include "Math/UnrealMathUtility.h"
 #include "Components/BoxComponent.h"
+#include "Player/FG_SFSM.h"
+#include "Player/States/Core/FG_GlidingPlayerState.h"
 
 // Sets default values
 AFG_Winddraft::AFG_Winddraft()
@@ -29,12 +31,13 @@ void AFG_Winddraft::BeginPlay()
 
 void AFG_Winddraft::ApplyWindForce(UPrimitiveComponent* ActorCapsuleComponent, AFG_PlayerCharacter* Player)
 {
-	UFG_GliderComponent* GliderComponent = Cast<UFG_GliderComponent>(Player->GetComponentByClass(UFG_GliderComponent::StaticClass()));
-	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("Wind"));
+	UFG_GliderComponent* GliderComponent = Player->Glider;
+	UE_LOG(LogTemp, Warning, TEXT("Overlap"))
 
-	if (GliderComponent->bIsGliding)
+	if (Player->StateMachine->TopIsEqual(Player->GlidingCoreState))
 	{
-		ActorCapsuleComponent->AddForce(GetActorUpVector() * WindSpeedGliding);
+		GliderComponent->ApplyWindForce(GetActorUpVector(), WindSpeedGliding);
+
 		//CapsuleComponent->AddImpulse(GetActorUpVector() * WindSpeedGliding);
 	}
 	else
@@ -43,5 +46,31 @@ void AFG_Winddraft::ApplyWindForce(UPrimitiveComponent* ActorCapsuleComponent, A
 		//CapsuleComponent->AddImpulse(GetActorUpVector() * WindSpeedNotGliding);
 	}
 
+}
+
+void AFG_Winddraft::OnLocomotionTouch_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller, EFG_TouchingState State)
+{
+	if (State == EFG_TouchingState::StillTouching)
+	{
+		AFG_PlayerCharacter* Player = Cast<AFG_PlayerCharacter>(LocomotionComponentOfCaller->GetOwner());
+		if (Player == nullptr)
+		{
+			return;
+		}
+		ApplyWindForce(Player->Collider, Player);
+	}
+}
+
+void AFG_Winddraft::OnGliderTouch_Implementation(UFG_GliderComponent* GliderComponentOfCaller, EFG_TouchingState State)
+{
+	if (State == EFG_TouchingState::StillTouching)
+	{
+		AFG_PlayerCharacter* Player = Cast<AFG_PlayerCharacter>(GliderComponentOfCaller->GetOwner());
+		if (Player == nullptr)
+		{
+			return;
+		}
+		ApplyWindForce(Player->Collider, Player);
+	}
 }
 

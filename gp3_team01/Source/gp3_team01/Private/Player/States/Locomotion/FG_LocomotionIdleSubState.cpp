@@ -9,11 +9,18 @@
 #include "Player/States/Locomotion/FG_LocomotionJumpingSubState.h"
 #include "Player/States/Locomotion/FG_LocomotionAirborneSubState.h"
 #include "Player/Movement/FG_LocomotionComponent.h"
+#include "Player/Movement/FG_LocomotionResponse.h"
+#include "FG_BroadcastTemplate.h"
 #include "Player/FG_SFSM.h"
 
 bool UFG_LocomotionIdleSubState::OnStateTick_Implementation(float DeltaTime)
 {
+	Super::OnStateTick_Implementation(DeltaTime);
 	const FVector Input = FGPlayerCharacter->Stats->InputStats->GetCameraNormalisedInputVector();
+	FVector PlayerForward = FGPlayerCharacter->MeshPivot->GetForwardVector();
+	PlayerForward.Z = 0.f;
+	FQuat Rotation = PlayerForward.ToOrientationQuat();
+	FGPlayerCharacter->MeshPivot->SetWorldRotation(Rotation);
 	if (!Input.IsNearlyZero()) {
 		Context->SubStateMachine->Push(Context->LocomotionMovingSubState);
 		return true;
@@ -22,11 +29,15 @@ bool UFG_LocomotionIdleSubState::OnStateTick_Implementation(float DeltaTime)
 		Context->SubStateMachine->Push(Context->LocomotionJumpingSubState);
 		return true;
 	}
-	if (!FGPlayerCharacter->LocomotionComp->Hover(FGPlayerCharacter->Stats->HoverStats)) {
+	if (!Context->IsCoyoteGrounded()) {
 		Context->SubStateMachine->Push(Context->LocomotionAirborneSubState);
 		return true;
 	}
 
+	for (auto& Hit : Context->GroundHit)
+	{
+		BroadcastResponse<IFG_LocomotionResponse>(Hit, IFG_LocomotionResponse::Execute_OnLocomotionStand, FGPlayerCharacter->LocomotionComp);
+	}
 	FGPlayerCharacter->LocomotionComp->ApplyFriction(FGPlayerCharacter->Stats->MoveStats);
 
 	return true;

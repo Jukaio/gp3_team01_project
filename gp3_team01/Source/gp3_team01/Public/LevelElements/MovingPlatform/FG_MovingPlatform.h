@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Player/Movement/FG_LocomotionResponse.h"
 #include "FG_MovingPlatform.generated.h"
 
 UCLASS()
-class AFG_MovingPlatform : public AActor
+class AFG_MovingPlatform : public AActor, public IFG_LocomotionResponse
 {
 	GENERATED_BODY()
 
@@ -27,11 +28,17 @@ public:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Moving Platform")
 	float Speed = 200.f;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Moving Platform", Meta = (MakeEditWidget = true))
+	UPROPERTY()
 	FVector StartLocation;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Moving Platform", Meta = (MakeEditWidget = true))
+	UPROPERTY()
 	FVector EndLocation;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Moving Platform", Meta = (MakeEditWidget = true))
+	FVector EditableEndLocation;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Moving Platform")
+	FVector DeltaMovementVector;
 
 	UPROPERTY()
 	bool IsMovingToEnd = true;

@@ -44,7 +44,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetFollowActor(AActor* Actor);
 
+	/// <summary>
+	/// Enables or disables manual mouse control of the camera
+	/// </summary>
+	UFUNCTION(BlueprintCallable)
+	void SetManuallyControllable(bool bSetManualControl);
+
+	/// <summary>
+	/// Rotates camera towards a given vector with given RotationDelta.
+	/// Note that X rotation is the camera itself and the Y rotation is the springarm.
+	/// Stupid thing doesnt work yet though   
+	/// </summary>
+	UFUNCTION(BlueprintCallable)
+	void RotateCamera(FVector Direction, float RotationDelta);
+
 private:
+	bool bManuallyControllable = true;
 	void HandleCameraXRotation(float InputAxis);
 	void HandleCameraYRotation(float InputAxis);
 };

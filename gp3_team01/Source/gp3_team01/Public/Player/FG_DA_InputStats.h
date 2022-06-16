@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class GP3_TEAM01_API UFG_DA_InputStats : public UDataAsset
 {
 	GENERATED_BODY()

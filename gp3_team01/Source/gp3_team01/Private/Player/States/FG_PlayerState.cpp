@@ -37,3 +37,30 @@ AFG_PlayerCharacter* UFG_PlayerState::GetFGPlayer() const
 	return FGPlayerCharacter;
 }
 
+void UFG_PlayerState::OnStateEnter_Implementation()
+{
+	TimeSinceEnter = 0.0f;
+}
+
+void UFG_PlayerState::OnStatePush_Implementation()
+{
+	TimeSincePush = 0.0f;
+}
+
+bool UFG_PlayerState::OnStateTick_Implementation(float DeltaTime)
+{
+	TimeSinceEnter += DeltaTime;
+	TimeSincePush += DeltaTime;
+	return false;
+}
+
+float UFG_PlayerState::GetTimeSinceEnter() const
+{
+	return TimeSinceEnter;
+}
+
+float UFG_PlayerState::GetTimeSincePush() const
+{
+	return TimeSincePush;
+}
+

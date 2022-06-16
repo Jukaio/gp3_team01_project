@@ -8,30 +8,39 @@
 #include "FG_DA_JumpStats.h"
 #include "FG_DA_MoveStats.h"
 #include "FG_DA_InputStats.h"
+#include "FG_DA_PlayerStateClasses.h"
 #include "FG_DA_PlayerStats.generated.h"
 
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class GP3_TEAM01_API UFG_DA_PlayerStats : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UFG_DA_PlayerStateClasses* PlayerStateClasses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFG_DA_InputStats* InputStats;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFG_DA_MoveStats* MoveStats;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFG_DA_MoveStats* AirborneStats;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFG_DA_HoverStats* HoverStats;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFG_DA_JumpStats* JumpStats;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UFG_DA_JumpStats* AirJumpStats;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UFG_DA_LedgevaultStats* LedgeStats;
 };

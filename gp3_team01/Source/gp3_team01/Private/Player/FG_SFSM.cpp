@@ -21,9 +21,25 @@ void UFG_SFSM::OnStateMachineTick(float DeltaTime)
 	(
 		INDEX_NONE,
 		DeltaTime,
-		FColor::Magenta,
+		FColor::Green,
 		Name
 	);
+	for (auto& Item : StateStack)
+	{
+		if (Item.Object == StateStack.Last().Object)
+		{
+			continue;
+		}
+
+		FString SomeName = Item.Object->GetFName().ToString();
+		GEngine->AddOnScreenDebugMessage
+		(
+			INDEX_NONE,
+			DeltaTime,
+			FColor::Magenta,
+			SomeName
+		);
+	}
 
 	const bool StackHasElements = StateStack.Num() != 0;
 	if (StackHasElements)
@@ -77,13 +93,26 @@ void UFG_SFSM::Pop()
 	}
 }
 
-bool UFG_SFSM::Contains(UPARAM(ref) const TScriptInterface<IFG_State>& State) const
+bool UFG_SFSM::Contains(TScriptInterface<IFG_State> State) const
 {
 	const auto Predicate = [&State](FStateObjectPair data) { return data.Object == State.GetObject(); };
 	return StateStack.ContainsByPredicate(Predicate);
 }
 
-bool UFG_SFSM::PopUntil(UPARAM(ref) TScriptInterface<IFG_State>& State)
+uint64 UFG_SFSM::Count(TScriptInterface<IFG_State> State) const
+{
+	const auto Predicate = [&State](FStateObjectPair data) { return data.Object == State.GetObject(); };
+	const uint64 Num = StateStack.FilterByPredicate(Predicate).Num();
+	return Num;
+}
+
+bool UFG_SFSM::TopIsEqual(TScriptInterface<IFG_State> State) const
+{
+	const FStateObjectPair& LastElement = StateStack.Last();
+	return LastElement.Object == State.GetObject();
+}
+
+bool UFG_SFSM::PopUntil(TScriptInterface<IFG_State> State)
 {
 	const auto IsSame = [](const TScriptInterface<IFG_State>& lhs, FStateObjectPair rhs) { return lhs.GetObject() == rhs.Object; };
 	const bool HasState = Contains(State);
@@ -128,7 +157,7 @@ bool UFG_SFSM::IsEmpty()
 	return StateStack.Num() == 0;
 }
 
-void UFG_SFSM::Push(const TScriptInterface<IFG_State>& State)
+void UFG_SFSM::Push(TScriptInterface<IFG_State> State)
 {
 	UObject* Object = State.GetObject();
 	const bool IsImplementingInterface = Object->GetClass()->ImplementsInterface(IFG_State::UClassType::StaticClass());

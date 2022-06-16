@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Player/FG_PlayerCharacter.h"
 #include "FG_GliderComponent.generated.h"
 
 
@@ -21,18 +23,28 @@ public:
 
 	UPROPERTY()
 	class UFG_LocomotionComponent* LocomotionComponent;
-
+	
+	
 	UPROPERTY()
-	class USceneComponent* SceneComponent;
+	class USceneComponent* PlayerBody;
 
 	UPROPERTY()
 	class UCapsuleComponent* CapsuleComponent;
 
+	UPROPERTY()
+	USpringArmComponent* SpringArmComponent;
+	
+	UPROPERTY()
+	AFG_PlayerCharacter* PlayerCharacter;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCurveFloat* GlidingTurnCurve;
+	
 	UPROPERTY(EditDefaultsOnly)
 	class UStaticMeshComponent* StaticMeshComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float GravityForce;
+	float GravitationalForce;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float GlidingForce = 100000.f;
@@ -45,21 +57,31 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float TurningSpeed = 5;
-	
-	float GliderMinimumGlide = 0.05f;
-	FVector GlideDirection;
 
-	FVector GlideVelocity;
-	float DragForce;
-	FVector LookDirection;
-	float GravitationalForce = 0.f;
-	float MaxGravitationalVelocity = 1500.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float TurnHorizontal;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float TurnVertical;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFG_DA_InputStats* InputStats;
+	
+	
+	FVector GlideDirection;
+	FVector GlideVelocity;
+	FVector LookDirection;
 	FVector CurrentVelocity;
 	FVector Input;
 	FVector PreviousVelocity = FVector::ZeroVector;
-
+	FVector WindDirection;
+	float DragForce;
+	float GravitationalVelocity = 0.f;
+	float MaxGravitationalVelocity = 1500.f;
+	float GliderMinimumGlide = 0.05f;
+	float WindDraftForce = 0.f;
+	float MaxWindDraftForce = 0.f;
+	FVector2D TimeTurned;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -68,9 +90,21 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void SetRotation();
+	void SetTimeTurned();
 	void Glide();
-	void GlideAxisControlled();
-	void Boost(FVector Boost);
+
+	UFUNCTION(BlueprintCallable)
+	bool CheckTouching(class UPrimitiveComponent* Component);
+
+	bool CheckTouchingGround(float DistanceRay);
 	
+	void ApplyWindForce(FVector WindDirection, float WindDraftForce);
+	void StartGliding();
+	void StopGliding();
 	void DrawDebug();
+
+private:
+	TSet<AActor*> LastCallResults;
+	TSet<AActor*> CurrentCallResults;
 };

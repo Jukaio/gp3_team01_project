@@ -30,4 +30,17 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	class AFG_PlayerCharacter* GetFGPlayer() const;
+
+	virtual void OnStateEnter_Implementation() override;
+	virtual void OnStatePush_Implementation() override;
+	virtual bool OnStateTick_Implementation(float DeltaTime) override;
+
+	UFUNCTION(BlueprintPure)
+	float GetTimeSinceEnter() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetTimeSincePush() const;
+private:
+	float TimeSinceEnter;
+	float TimeSincePush;
 };

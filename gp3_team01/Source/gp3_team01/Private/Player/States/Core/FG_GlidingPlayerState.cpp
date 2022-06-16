@@ -10,6 +10,12 @@
 #include "Player/FG_SFSM.h"
 #include "Player/States/Gliding/FG_GlidingIdleSubState.h"
 #include "Player/States/Gliding/FG_GlidingSteeringSubState.h"
+#include "Player/ABP_Player.h"
+#include "Player/ABP_Glider.h"
+#include "Audio/FG_DA_Instrument.h"
+#include "Audio/FG_InstrumentComponent.h"
+#include "Audio/InstrumentChord.h"
+#include <algorithm>
 
 // Sets default values for this component's properties
 UFG_GlidingPlayerState::UFG_GlidingPlayerState()
@@ -29,7 +35,11 @@ void UFG_GlidingPlayerState::BeginPlay()
 	Super::BeginPlay();
 	GliderComponent = FGPlayerCharacter->Glider;
 	FGPlayerCharacter->Collider->OnComponentHit.AddDynamic(this, &UFG_GlidingPlayerState::OnCollision);
+	UE_LOG(LogTemp, Warning, TEXT("Start"));
 	SubStateMachine = NewObject<UFG_SFSM>();
+
+
+	InstrumentHandler = Cast<UFG_InstrumentComponent>(GetOwner()->GetComponentByClass(UFG_InstrumentComponent::StaticClass()));
 }
 
 
@@ -41,33 +51,38 @@ void UFG_GlidingPlayerState::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
-void UFG_GlidingPlayerState::OnStateEnter_Implementation()
+void UFG_GlidingPlayerState::OnStatePush_Implementation()
 {
+	Super::OnStatePush_Implementation();
 	SubStateMachine->Push(GlidingIdleSubState);
-
-	GliderComponent->PreviousVelocity = FVector::ZeroVector;
-	GliderComponent->CurrentVelocity = FVector::ZeroVector;
-	GliderComponent->GravitationalForce = 0.f;
-	GliderComponent->GlideDirection = FGPlayerCharacter->GetActorForwardVector();
+	GliderComponent->StartGliding();
+	
 	UCapsuleComponent* CapsuleCollider = FGPlayerCharacter->Collider;
 	CapsuleCollider->SetEnableGravity(false);
+	FGPlayerCharacter->GetABP()->bIsGliding = true;
+	FGPlayerCharacter->GetGliderABP()->bIsActive = true;
+	FGPlayerCharacter->GetGliderABP()->Montage_Play(FGPlayerCharacter->GliderEquipMontage, 1, EMontagePlayReturnType::MontageLength, 0, true);
+	FGPlayerCharacter->GliderMesh->SetVisibility(true, false);
 	bIsColliding = false;
 }
 
-void UFG_GlidingPlayerState::OnStateExit_Implementation()
+void UFG_GlidingPlayerState::OnStatePop_Implementation()
 {
+	Super::OnStatePop_Implementation();
 	SubStateMachine->Clear();
+	GliderComponent->StopGliding();
 	UCapsuleComponent* CapsuleCollider = FGPlayerCharacter->Collider;
-	GliderComponent->PreviousVelocity = FVector::ZeroVector;
-	GliderComponent->CurrentVelocity = FVector::ZeroVector;
-	GliderComponent->GravitationalForce = 0.f;
-	GliderComponent->GlideDirection = FGPlayerCharacter->GetActorForwardVector();
+	FGPlayerCharacter->GetABP()->bIsGliding = false;
+	FGPlayerCharacter->GetGliderABP()->bIsActive = false;
+	FGPlayerCharacter->GliderMesh->SetVisibility(false, false);
 	CapsuleCollider->SetEnableGravity(true);
 }
 
 bool UFG_GlidingPlayerState::OnStateTick_Implementation(float DeltaTime)
 {
+	GliderComponent->CheckTouching(FGPlayerCharacter->Collider);
 	SubStateMachine->OnStateMachineTick(DeltaTime);
+	
 	GliderComponent->Glide();
 	const bool IsGlidingPressed = FGPlayerCharacter->Stats->InputStats->GetIsGlidingPressed();
 	
@@ -76,7 +91,28 @@ bool UFG_GlidingPlayerState::OnStateTick_Implementation(float DeltaTime)
 		UE_LOG(LogTemp, Warning, TEXT("Exited glide state"));
 		return false;
 	}
-	return IsGlidingPressed;
+
+	const float WorldTime = GetWorld()->TimeSeconds;
+	const float Difference = WorldTime - LastTimeMoveWasPlayed;
+	if (ensure(InstrumentHandler != nullptr) && Difference > PlayTimeBuffer)
+	{
+		if (RandomIndeces.Num() == 0)
+		{
+			for (int i = 0; i < Chimes->Num(); i++)
+			{
+				RandomIndeces.Push(i);
+			}
+			std::random_shuffle(RandomIndeces.GetData(), RandomIndeces.GetData() + RandomIndeces.Num());
+		}
+		const int RandomIndex = RandomIndeces.Pop(false);
+		const UInstrumentChord* Chord = Chimes->Find(RandomIndex);
+		PlayTimeBuffer = Chord->Notes[0]->Duration * 0.9f;
+		InstrumentHandler->PlayChord(Chord, 0.45f, 1.0f, 0, 0.15f, 0.9f);
+		LastTimeMoveWasPlayed = WorldTime;
+	}
+	
+	const bool IsLanding = GliderComponent->CheckTouchingGround(FGPlayerCharacter->Stats->HoverStats->HoverRayDistance);
+	return IsGlidingPressed && !IsLanding;
 	//UFG_LocomotionComponent* Locomotion = FGPlayerCharacter->LocomotionComp;
 }
 

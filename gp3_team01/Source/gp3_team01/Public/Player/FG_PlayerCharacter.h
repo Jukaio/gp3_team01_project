@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "FG_PlayerCharacter.generated.h"
 
+class AFG_Camera;
+class UABP_Player;
 UCLASS()
 class GP3_TEAM01_API AFG_PlayerCharacter : public APawn
 {
@@ -23,38 +25,101 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	/// <summary>
+	/// Returns a reference to your FG_Camera
+	/// </summary>
+	/// <returns></returns>
+	AFG_Camera* GetMyCamera();
+
+	/// <summary>
+	/// Returns a reference to the AnimInstance
+	/// </summary>
+	UABP_Player* GetABP();
+
+	class UABP_Glider* GetGliderABP();
+
+
 public: //Components
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	class USceneComponent* Root;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UFG_InputWriteComponent* InputWriter;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UFG_LocomotionComponent* LocomotionComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UFG_GliderComponent* Glider;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	class UFG_SFSM* StateMachine;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UCapsuleComponent* Collider;
 
+	//Attach the visual mesh onto this!
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class USceneComponent* MeshPivot;
+
+	UPROPERTY(VisibleAnywhere, Category = Animations)
+	class USkeletalMeshComponent* PlayerMesh;
+
+	UPROPERTY(VisibleAnywhere, Category = Animations)
+	class USkeletalMeshComponent* GliderMesh;
+
+	
+
+	
+
 public: //Public Variables
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UFG_DA_PlayerStats* Stats;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UFG_LocomotionPlayerState* LocomotionCoreState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UFG_GlidingPlayerState* GlidingCoreState;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UFG_InstrumentComponent* InstrumentUser;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AFG_Camera> CameraClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UAnimMontage* JumpMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	UAnimMontage* LandMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	UAnimMontage* LedgejumpMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	UAnimMontage* GliderEquipMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	UAnimMontage* GliderUnequippMontage;
+
+	
+
+
+	
 
 private: //Private Variables
 
+	UPROPERTY(EditDefaultsOnly)
+	AFG_Camera* MyCamera;
+
+	UPROPERTY()
+	UABP_Player* AnimBP; //Cast the playermeshes AnimClass into an UABP_Player in BeginPlay and work the magic from there boyo
+
+	UPROPERTY()
+	UABP_Glider* GliderAnimBP;
+	
 
 
 };

@@ -18,7 +18,14 @@ class GP3_TEAM01_API UFG_GlidingPlayerState : public UFG_PlayerState
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	UPROPERTY()
+	UFG_LocomotionComponent* Locomotion;
+	UPROPERTY()
+	UPrimitiveComponent* Primitive;
 
+	TArray<int> RandomIndeces;
+	float LastTimeMoveWasPlayed = 0.0f;
+	float PlayTimeBuffer = 0.0f;
 public:
 	UFG_GlidingPlayerState();
 
@@ -37,10 +44,21 @@ public:
 	UFG_GliderComponent* GliderComponent;
 	bool bIsColliding;
 
-	virtual void OnStateEnter_Implementation() final;
-	virtual void OnStateExit_Implementation() final;
-	virtual bool OnStateTick_Implementation(float DeltaTime) final;
+	virtual void OnStatePush_Implementation() override;
+	virtual void OnStatePop_Implementation() override;
+	virtual bool OnStateTick_Implementation(float DeltaTime) override;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UFG_DA_Instrument* Instrument;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UFG_DA_Instrument* Chimes;
+	UPROPERTY()
+	class UInstrumentChord* CurrentChord;
+	UPROPERTY()
+	class UFG_InstrumentComponent* InstrumentHandler;
+
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1,
 	                 FVector Vector, const FHitResult& HitResult);
+	
 };

@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Player/Movement/FG_LocomotionResponse.h"
+#include "Player/Gliding/FG_GliderResponse.h"
 #include "FG_Winddraft.generated.h"
 
 class UBoxComponent;
 
 UCLASS()
-class GP3_TEAM01_API AFG_Winddraft : public AActor
+class GP3_TEAM01_API AFG_Winddraft : public AActor, public IFG_LocomotionResponse, public IFG_GliderResponse
 {
 	GENERATED_BODY()
 
@@ -20,6 +22,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
 
 public:
 
@@ -38,13 +41,12 @@ public:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = Winddraft)
 	float WindSpeedNotGliding = 60000.f;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = Winddraft)
-	bool IsWinddraftOn = true;
-
 	UPROPERTY()
 	bool IsApplyingForceOnPlayer = false;
 
 	UFUNCTION(BlueprintCallable)
 	void ApplyWindForce(class UPrimitiveComponent* OtherActor, AFG_PlayerCharacter* Player);
-
+	
+	virtual void OnLocomotionTouch_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller, EFG_TouchingState State) override;
+	virtual void OnGliderTouch_Implementation(UFG_GliderComponent* GliderComponentOfCaller, EFG_TouchingState State) override;
 };

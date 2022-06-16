@@ -15,7 +15,18 @@ class GP3_TEAM01_API UFG_LocomotionMovingSubState : public UFG_LocomotionSubStat
 	GENERATED_BODY()
 	
 	virtual void OnStateEnter_Implementation() override;
+	virtual void OnStatePush_Implementation() override;
+	virtual void OnStateExit_Implementation() override;
 	virtual bool OnStateTick_Implementation(float DeltaTime) override;
 
-	float Timer = 0.0f;
+	float LastTimeMoveWasPlayed = 0.0f;
+public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartMoving(class AFG_PlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMoving(class AFG_PlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnEndMoving(class AFG_PlayerCharacter* PlayerCharacter);
 };

@@ -15,8 +15,19 @@ class GP3_TEAM01_API UFG_LocomotionJumpingSubState : public UFG_LocomotionSubSta
 	GENERATED_BODY()
 	
 	virtual void OnStatePush_Implementation() override;
+	virtual void OnStatePop_Implementation() override;
 	virtual bool OnStateTick_Implementation(float DeltaTime) override;
 
-	bool bWasJustPushed = false;
-	float Timer = 0.0f;
+	bool bIsContinousJumpingPossible = false;
+
+public:
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartJumping(class AFG_PlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnContinousJumping(class AFG_PlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnEndJumping(class AFG_PlayerCharacter* PlayerCharacter);
 };

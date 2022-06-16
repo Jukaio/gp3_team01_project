@@ -29,15 +29,31 @@ class GP3_TEAM01_API IFG_LocomotionResponse
 public:
 
 	// BP interface
+	// Hovering interfac
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnLocomotionJump(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnLocomotionLand(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnLocomotionMove(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnLocomotionStand(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnLocomotionLeft(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnLocomotionTouch(UFG_LocomotionComponent* LocomotionComponentOfCaller, EFG_TouchingState State);
 	
 	// C++ interface
 	virtual void OnLocomotionJump_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller);
 	virtual void OnLocomotionLand_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+	virtual void OnLocomotionMove_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+	virtual void OnLocomotionStand_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller);
 	virtual void OnLocomotionTouch_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller, EFG_TouchingState State);
+	virtual void OnLocomotionLeft_Implementation(UFG_LocomotionComponent* LocomotionComponentOfCaller);
+
 };

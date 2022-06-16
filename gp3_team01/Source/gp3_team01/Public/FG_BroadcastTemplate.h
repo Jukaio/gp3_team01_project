@@ -11,7 +11,6 @@ constexpr inline void BroadcastResponse(AActor* Actor, ExecuteFunctor Func, Para
 	if (Actor == nullptr) {
 		return;
 	}
-
 	const bool IsImplemented = Actor->GetClass()->ImplementsInterface(Interface::UClassType::StaticClass());
 	if (IsImplemented)
 	{

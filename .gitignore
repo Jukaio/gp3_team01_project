@@ -72,3 +72,5 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+gp3_team01/NIAGARABAKERVIEWMODEL.ipch
+gp3_team01/NIAGARABAKERSETTINGSDETAILS.ipch
