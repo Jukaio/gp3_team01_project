@@ -29,7 +29,7 @@ public:
 	void OnCollect(class AFG_PlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(BlueprintCallable)
-	void HideSelf() const;
+	void HideSelf(bool StillVisislbe) const;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UDA_FG_IntegerData* Score;

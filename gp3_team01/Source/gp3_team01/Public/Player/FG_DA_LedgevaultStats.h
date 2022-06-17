@@ -31,6 +31,9 @@ public:
 	float WallHugForce;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WallClimb)
+	float WallHorizontalClimbForce = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WallClimb)
 	float WallClimbForce;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WallClimb)

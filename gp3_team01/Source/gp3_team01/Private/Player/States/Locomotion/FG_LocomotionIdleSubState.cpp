@@ -12,6 +12,7 @@
 #include "Player/Movement/FG_LocomotionResponse.h"
 #include "FG_BroadcastTemplate.h"
 #include "Player/FG_SFSM.h"
+#include "Player/States/Core/FG_GlidingPlayerState.h"
 
 bool UFG_LocomotionIdleSubState::OnStateTick_Implementation(float DeltaTime)
 {
@@ -31,6 +32,14 @@ bool UFG_LocomotionIdleSubState::OnStateTick_Implementation(float DeltaTime)
 	}
 	if (!Context->IsCoyoteGrounded()) {
 		Context->SubStateMachine->Push(Context->LocomotionAirborneSubState);
+		return true;
+	}
+
+	if (FGPlayerCharacter->Stats->InputStats->GetWasGlidingJustPressed())
+	{
+		Context->SubStateMachine->Push(Context->LocomotionAirborneSubState);
+		FGPlayerCharacter->LocomotionComp->JumpRAW(100.0f, FGPlayerCharacter->Stats->JumpStats->RayDistance);
+		FGPlayerCharacter->StateMachine->Push(FGPlayerCharacter->GlidingCoreState);
 		return true;
 	}
 

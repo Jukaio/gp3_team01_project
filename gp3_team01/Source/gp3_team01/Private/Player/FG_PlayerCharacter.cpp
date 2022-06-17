@@ -20,7 +20,7 @@
 #include "Cameras/FG_Camera.h"
 #include "Player/FG_SFSM.h"
 #include "TemplateHelper.h"
-
+#include "LevelElements/Collectible/FG_CollectorComponent.h"
 
 // Sets default values
 AFG_PlayerCharacter::AFG_PlayerCharacter()
@@ -33,6 +33,7 @@ AFG_PlayerCharacter::AFG_PlayerCharacter()
 	LocomotionComp = CreateDefaultSubobject<UFG_LocomotionComponent>(TEXT("LocomotionComponent"));
 	InstrumentUser = CreateDefaultSubobject<UFG_InstrumentComponent>(TEXT("InstrumentComponent"));
 	Glider = CreateDefaultSubobject<UFG_GliderComponent>(TEXT("Glider"));
+	Collector = CreateDefaultSubobject<UFG_CollectorComponent>(TEXT("Collector"));
 
 	MeshPivot = CreateDefaultSubobject<USceneComponent>(TEXT("MeshPivot"));
 	MeshPivot->SetupAttachment(Collider);

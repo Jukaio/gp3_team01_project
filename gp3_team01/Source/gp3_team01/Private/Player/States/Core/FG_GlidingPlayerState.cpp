@@ -34,7 +34,7 @@ void UFG_GlidingPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 	GliderComponent = FGPlayerCharacter->Glider;
-	FGPlayerCharacter->Collider->OnComponentHit.AddDynamic(this, &UFG_GlidingPlayerState::OnCollision);
+	//FGPlayerCharacter->Collider->OnComponentHit.AddDynamic(this, &UFG_GlidingPlayerState::OnCollision);
 	UE_LOG(LogTemp, Warning, TEXT("Start"));
 	SubStateMachine = NewObject<UFG_SFSM>();
 
@@ -80,17 +80,19 @@ void UFG_GlidingPlayerState::OnStatePop_Implementation()
 
 bool UFG_GlidingPlayerState::OnStateTick_Implementation(float DeltaTime)
 {
-	GliderComponent->CheckTouching(FGPlayerCharacter->Collider);
+	Super::OnStateTick_Implementation(DeltaTime);
+
+	const bool IsColliding = GliderComponent->CheckTouching(FGPlayerCharacter->Collider);
 	SubStateMachine->OnStateMachineTick(DeltaTime);
 	
 	GliderComponent->Glide();
 	const bool IsGlidingPressed = FGPlayerCharacter->Stats->InputStats->GetIsGlidingPressed();
 	
-	if(bIsColliding)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Exited glide state"));
-		return false;
-	}
+	//if(bIsColliding)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Exited glide state"));
+	//	return false;
+	//}
 
 	const float WorldTime = GetWorld()->TimeSeconds;
 	const float Difference = WorldTime - LastTimeMoveWasPlayed;
@@ -111,8 +113,12 @@ bool UFG_GlidingPlayerState::OnStateTick_Implementation(float DeltaTime)
 		LastTimeMoveWasPlayed = WorldTime;
 	}
 	
+	if (GetTimeSincePush() < 0.2f)
+	{
+		return true;
+	}
 	const bool IsLanding = GliderComponent->CheckTouchingGround(FGPlayerCharacter->Stats->HoverStats->HoverRayDistance);
-	return IsGlidingPressed && !IsLanding;
+	return IsGlidingPressed && !IsLanding && !IsColliding;
 	//UFG_LocomotionComponent* Locomotion = FGPlayerCharacter->LocomotionComp;
 }
 

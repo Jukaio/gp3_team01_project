@@ -7,6 +7,7 @@
 #include "Player/FG_DA_LedgevaultStats.h"
 #include "Player/FG_PlayerCharacter.h"
 #include "Player/FG_SFSM.h"
+#include "Player/ABP_Player.h"
 #include "Player/States/Core/FG_LocomotionPlayerState.h"
 #include "Player/Movement/FG_LocomotionComponent.h"
 #include "Player/States/Locomotion/FG_LocomotionLedgevaultSubState.h"
@@ -23,6 +24,7 @@ void UFG_LocomotionWallclimbSubState::OnStatePush_Implementation()
 	Super::OnStatePush_Implementation();
 	OnStarWallClimbing(FGPlayerCharacter);
 	bIsWallClimbingPossible = true;
+	FGPlayerCharacter->GetABP()->bIsClimbing = true;
 
 	const int RandomIndex = FMath::Rand() % Context->Bells->Num();
 	//Context->InstrumentHandler->PlayChord(Context->Bells->Find(RandomIndex), 0.50f, 1.5f, 0);
@@ -34,6 +36,7 @@ bool UFG_LocomotionWallclimbSubState::OnStateTick_Implementation(float DeltaTime
 
 	UFG_DA_PlayerStats* Stats = FGPlayerCharacter->Stats;
 	UFG_LocomotionComponent* LocoComp = FGPlayerCharacter->LocomotionComp;
+	UFG_DA_InputStats* Input = FGPlayerCharacter->Stats->InputStats;
 
 	const bool HasNotReachedJumpLimit = Context->SubStateMachine->Count(Context->LocomotionAirJumpSubState) < 1;
 	if (Stats->InputStats->GetWasJumpingJustPressed() && HasNotReachedJumpLimit) {
@@ -73,7 +76,10 @@ bool UFG_LocomotionWallclimbSubState::OnStateTick_Implementation(float DeltaTime
 	}
 
 	LocoComp->WallClimbDuration -= DeltaTime;
+	
 	LocoComp->HandleClimbOnWallRAW(Stats->LedgeStats->WallHugForce, Stats->LedgeStats->WallClimbForce, Stats->LedgeStats->WallClimbMaxSpeed);
+	FGPlayerCharacter->Collider->AddForce(Input->GetCameraNormalisedInputVector() * Stats->LedgeStats->WallHorizontalClimbForce, NAME_None, true);
+
 
 	//If not inputting or inputting a direction away from wall, pop
 	float InputAndLedgeDot = FVector::DotProduct(Stats->InputStats->GetCameraNormalisedInputVector(), LocoComp->GetWallClimbNormal());
@@ -98,5 +104,6 @@ void UFG_LocomotionWallclimbSubState::OnStatePop_Implementation()
 	bIsWallClimbingPossible = false;
 	FGPlayerCharacter->LocomotionComp->DisableWallClimb();
 	FGPlayerCharacter->LocomotionComp->DisableLedgeGrab();
+	FGPlayerCharacter->GetABP()->bIsClimbing = false;
 	OnEndWallClimbing(FGPlayerCharacter);
 }

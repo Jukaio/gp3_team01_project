@@ -8,7 +8,9 @@
 #include "Audio/FG_DA_Instrument.h"
 #include "Audio/FG_InstrumentComponent.h"
 #include "Audio/InstrumentChord.h"
-
+#include "Player/States/Core/FG_LocomotionPlayerState.h"
+#include "Player/States/Locomotion/FG_LocomotionAirborneSubState.h"
+#include "Player/FG_SFSM.h"
 
 // Sets default values
 AFG_YakAICharacter::AFG_YakAICharacter()
@@ -45,6 +47,7 @@ void AFG_YakAICharacter::Bounce(UFG_LocomotionComponent* Locomotion, float RayDi
 	AFG_PlayerCharacter* Player = Cast<AFG_PlayerCharacter>(Locomotion->GetOwner());
 	if (Difference > Threshold)
 	{
+		Player->LocomotionCoreState->SubStateMachine->Push(Player->LocomotionCoreState->LocomotionAirborneSubState);
    		Locomotion->JumpRAW(BounceForce, RayDistance, DisableFloatTimer);
 		if (InstrumentHandler != nullptr)
 		{

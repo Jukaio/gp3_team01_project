@@ -40,10 +40,10 @@ void UFG_CollectibleComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	// ...
 }
 
-void UFG_CollectibleComponent::HideSelf() const
+void UFG_CollectibleComponent::HideSelf(bool StillVisislbe) const
 {
 	AActor* Self = GetOwner();
-	Self->SetActorHiddenInGame(true);
+	Self->SetActorHiddenInGame(!StillVisislbe);
 	Self->SetActorEnableCollision(false);
 	Self->SetActorTickEnabled(false);
 }

@@ -14,6 +14,7 @@
 #include "Audio/FG_DA_Instrument.h"
 #include "Audio/FG_InstrumentComponent.h"
 #include "Audio/InstrumentChord.h"
+#include "Player/States/Core/FG_GlidingPlayerState.h"
 
 void UFG_LocomotionMovingSubState::OnStateEnter_Implementation()
 {
@@ -52,7 +53,13 @@ bool UFG_LocomotionMovingSubState::OnStateTick_Implementation(float DeltaTime)
 		Context->InstrumentHandler->PlayChord(Context->Bells->Find(RandomIndex), 0.50f, 1.0f, 2, 0.25f, 1.0f);
 		LastTimeMoveWasPlayed = WorldTime;
 	}
-
+	if (FGPlayerCharacter->Stats->InputStats->GetWasGlidingJustPressed())
+	{
+		Context->SubStateMachine->Push(Context->LocomotionAirborneSubState);
+		FGPlayerCharacter->LocomotionComp->JumpRAW(100.0f, FGPlayerCharacter->Stats->JumpStats->RayDistance);
+		FGPlayerCharacter->StateMachine->Push(FGPlayerCharacter->GlidingCoreState);
+		return true;
+	}
 
 	UFG_DA_MoveStats* MoveStats = FGPlayerCharacter->Stats->MoveStats;
 	UFG_LocomotionComponent* Locomotion = FGPlayerCharacter->LocomotionComp;

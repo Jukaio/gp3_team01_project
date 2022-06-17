@@ -53,6 +53,9 @@ public: //Components
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UFG_GliderComponent* Glider;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UFG_CollectorComponent* Collector;
+
 	UPROPERTY(BlueprintReadOnly)
 	class UFG_SFSM* StateMachine;
 

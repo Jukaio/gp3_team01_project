@@ -61,9 +61,11 @@ void UFG_GliderComponent::Glide()
 	
 	PlayerBody->SetWorldRotation(NewRotation);
 	
-	float PitchRoll = PlayerCharacter->GetMyCamera()->Camera->GetRightVector() | CapsuleComponent->GetPhysicsLinearVelocity().GetSafeNormal();
-	FRotator Roll = FRotator(0.f, 0.f,  -PitchRoll * 8.f);
-	PlayerBody->SetWorldRotation(PlayerBody->GetComponentRotation() + Roll);
+	float Roll = PlayerCharacter->GetMyCamera()->Camera->GetRightVector() | CapsuleComponent->GetPhysicsLinearVelocity().GetSafeNormal();
+	float Pitch = PlayerCharacter->GetMyCamera()->Camera->GetUpVector() | CapsuleComponent->GetPhysicsLinearVelocity().GetSafeNormal();
+	
+	FRotator GliderRotation = FRotator(0.f, 0.f,   FMath::Clamp( -Roll * GliderRollSpeed * FMath::Clamp(CurrentVelocity.Size() / 1000.f + 1.f, 1.f, 2.f) * GetWorld()->DeltaTimeSeconds, -15.f, 15.f));
+	PlayerBody->SetWorldRotation(PlayerBody->GetComponentRotation() + GliderRotation);
 	float LiftForceNormalized = FVector::UpVector | GlideDirection;
 	float DeltaTime = GetWorld()->DeltaTimeSeconds;
 	CurrentVelocity += WindDirection * WindDraftForce * DeltaTime;
@@ -90,10 +92,11 @@ void UFG_GliderComponent::Glide()
 void UFG_GliderComponent::ApplyWindForce(FVector Direction, float Force)
 {
 	WindDirection = Direction;
-	WindDraftForce = Force;
+	WindDraftForce += Force * GetWorld()->DeltaTimeSeconds * 10;
 	MaxWindDraftForce = Force;
+	WindDraftForce = FMath::Clamp(Force, 0.f, MaxWindDraftForce);
 	PlayerCharacter->GetMyCamera()->SpringArm->SetWorldRotation(FQuat::Slerp (PlayerCharacter->GetMyCamera()->SpringArm->GetForwardVector().ToOrientationQuat(),
-		(WindDraftForce * WindDirection).ToOrientationQuat(), 2.f * GetWorld()->DeltaTimeSeconds));
+		(WindDraftForce * WindDirection).ToOrientationQuat(), 1.5f * GetWorld()->DeltaTimeSeconds));
 }
 
 void UFG_GliderComponent::StartGliding()

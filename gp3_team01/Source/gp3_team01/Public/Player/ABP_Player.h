@@ -26,5 +26,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsGliding;
-	
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsClimbing;
 };

@@ -37,13 +37,10 @@ void AFG_Winddraft::ApplyWindForce(UPrimitiveComponent* ActorCapsuleComponent, A
 	if (Player->StateMachine->TopIsEqual(Player->GlidingCoreState))
 	{
 		GliderComponent->ApplyWindForce(GetActorUpVector(), WindSpeedGliding);
-
-		//CapsuleComponent->AddImpulse(GetActorUpVector() * WindSpeedGliding);
 	}
 	else
 	{
 		ActorCapsuleComponent->AddForce(GetActorUpVector() * WindSpeedNotGliding);
-		//CapsuleComponent->AddImpulse(GetActorUpVector() * WindSpeedNotGliding);
 	}
 
 }

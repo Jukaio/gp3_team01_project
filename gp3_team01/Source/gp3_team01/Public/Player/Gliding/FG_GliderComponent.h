@@ -18,12 +18,8 @@ public:
 	// Sets default values for this component's properties
 	UFG_GliderComponent();
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool bIsGliding;
-
 	UPROPERTY()
 	class UFG_LocomotionComponent* LocomotionComponent;
-	
 	
 	UPROPERTY()
 	class USceneComponent* PlayerBody;
@@ -56,8 +52,11 @@ public:
 	float TurningEfficiency = 10.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float TurningSpeed = 5;
-
+	float TurningSpeed = 5.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float GliderRollSpeed = 750.f;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float TurnHorizontal;
 
@@ -67,13 +66,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFG_DA_InputStats* InputStats;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsGliding;
 	
 	FVector GlideDirection;
 	FVector GlideVelocity;
 	FVector LookDirection;
 	FVector CurrentVelocity;
-	FVector Input;
 	FVector PreviousVelocity = FVector::ZeroVector;
+	FVector Input;
+	
 	FVector WindDirection;
 	float DragForce;
 	float GravitationalVelocity = 0.f;
